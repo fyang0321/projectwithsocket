@@ -1,4 +1,4 @@
-package edu.uchicago.networks;
+package networks;
 
 import java.io.*;
 import java.util.*;
@@ -20,7 +20,7 @@ public class HttpRequestManager {
 		boolean isFirstLine = true;
 		String line = null;
 		try {
-			while ( (line = clientRequest.readLine()) != null) {
+			while ( (line = clientRequest.readLine()) != null && !line.equals("")) {
 				if (isFirstLine) { //handle the first Request line
 					String[] parts = line.split(" ");
 					this.type = HttpRequestType.valueOf(parts[0]);
@@ -29,7 +29,8 @@ public class HttpRequestManager {
 					isFirstLine = false;
 				} else {
 					String[] parts = line.split(":");
-					metaData.put(parts[0], parts[1]);
+					if (parts.length > 1)
+						metaData.put(parts[0], parts[1]);
 				}
 			}
 		} catch (IOException e) {
@@ -70,7 +71,7 @@ public class HttpRequestManager {
 				System.exit(-1);
 		}
 		System.out.println(manager.getRequestType().toString());
-		System.out.println(manager.getFilePath());
+		System.out.println("File path is " + manager.getFilePath());
 		System.out.println(manager.getHttpVersion());	
 		System.out.println(manager.getLength());
 	}

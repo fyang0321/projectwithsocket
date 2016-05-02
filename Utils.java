@@ -1,4 +1,4 @@
-package edu.uchicago.networks;
+package networks;
 
 import java.util.HashMap;
 import java.util.Map;

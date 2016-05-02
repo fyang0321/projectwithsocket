@@ -1,4 +1,4 @@
-package edu.uchicago.networks;
+package networks;
 
 public enum MimeType {
 	
