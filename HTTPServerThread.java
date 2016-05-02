@@ -12,9 +12,7 @@ public class HTTPServerThread extends Thread {
     }
      
     public void run() {
-        try {
-        	boolean running = true;
-    	
+        try {    	
             DataOutputStream toClientStream = new DataOutputStream(socket.getOutputStream());
             BufferedReader fromClientStream  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 

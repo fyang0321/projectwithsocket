@@ -73,6 +73,5 @@ public class HttpResponseManager {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
 	}
 }
