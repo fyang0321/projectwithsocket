@@ -6,11 +6,12 @@ JC = javac
 
 CLASSES = \
         HttpRequestType.java \
+				MimeType.java \
         HttpRequestManager.java \
         HttpResponseManager.java \
         Utils.java \
         HTTPServerThread.java \
-        HTTPServer.java 
+        HTTPServer.java
 
 default: classes
 

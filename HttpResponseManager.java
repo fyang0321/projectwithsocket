@@ -9,20 +9,53 @@ public class HttpResponseManager {
 	private HttpRequestManager requestManager = null;
 	private String requestedFilePath = null;
 
+	private Map<String, String> redirectURL = null;
+	private MimeType datatype = null;
+
 	public HttpResponseManager(HttpRequestManager request) {
 		header = new HashMap<String, String>();
 		requestManager = request;
 
 		requestedFilePath = "www" + requestManager.getFilePath();
-	}	
+		getRedirectURL();
+		getMimeType();
+	}
+
+	private void getRedirectURL(){
+		String oneLine;
+		redirectURL = new HashMap<String, String>();
+
+		try{
+			FileReader redirectDef = new FileReader("wwww/redirect.defs");
+			BufferedReader redIn = new BufferedReader(redirectDef);
+
+			while((oneLine = redIn.readLine()) != null){
+				String parts[] = oneLine.split(" ");
+				redirectURL.put(parts[0], parts[1]);
+				//System.out.println(parts[0] + " " + parts[1]);
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
+	private void getMimeType(){
+		String parts[] = this.requestedFilePath.split(".");
+		String type_string = parts[parts.length - 1];
+		this.datatype = MimeType.valueOf(type_string);
+	}
 
 	private void buildHeader(StringBuffer sb, int contentLen) {
 		header.put("Connection", "Closed");
 		header.put("Date", new Date().toString());
-		header.put("Content-Length", Integer.toString(contentLen)); 
+		header.put("Content-Length", Integer.toString(contentLen));
 		header.put("Server", "Hello I am server!");
-
-		header.put("Content-Type", "application/unknown"); //TODO: content type
+		header.put("Content-Type", this.datatype.toString()); //TODO: content type
 
 		for (String name : this.header.keySet()) {
 			sb.append(String.format("%s: %s\r\n", name, this.header.get(name)));
@@ -55,16 +88,26 @@ public class HttpResponseManager {
 	public void buildResponse(DataOutputStream toClientStream) {
 		StringBuffer sb = new StringBuffer();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				//TODO: handle redirect
 		File requestedFile = new File(this.requestedFilePath);
-		if (!requestedFile.exists()) {
-			//TODO: throw exception
+				//TODO: handle redirect
+		if(redirectURL.containsKey(this.requestedFilePath)){
+			sb.append(String.format("HTTP/1.1 301 Redirection \r\n"));
+			String newURL = redirectURL.get(this.requestedFilePath);
+			int contentLength = newURL.length();
+			byte[] byteArray = newURL.getBytes();
+			outputStream.write(byteArray, 0, 0);
+			buildHeader(sb, contentLength);
 		}
-
-		sb.append(String.format("HTTP/1.1 200 OK \r\n"));
-		int contentLength = buildReternData(outputStream, requestedFile);
-		buildHeader(sb, contentLength);
-
+		else if (!requestedFile.exists()) {
+			//TODO: throw exception
+			sb.append(String.format("HTTP/1.1 404 Not Found \r\n"));
+			buildHeader(sb, 0);
+		}
+		else{
+			sb.append(String.format("HTTP/1.1 200 OK \r\n"));
+			int contentLength = buildReternData(outputStream, requestedFile);
+			buildHeader(sb, contentLength);
+		}
 		try {
 			toClientStream.writeBytes("\r");
 			toClientStream.writeBytes(sb.toString());
