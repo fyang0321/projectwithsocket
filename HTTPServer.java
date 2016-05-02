@@ -20,9 +20,10 @@ public class HTTPServer {
 			System.exit(-1);
 		}
 
-        boolean listening = true;
-        ServerSocket serverSocket = new ServerSocket(serverPort);
-        while (listening) {    
+		boolean listening = true;
+		ServerSocket serverSocket = new ServerSocket(serverPort); 
+		while (listening) {    
+
         	try {
                 new HTTPServerThread(serverSocket.accept()).start();
         	} catch (IOException e) {

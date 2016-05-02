@@ -15,18 +15,16 @@ public class HTTPServerThread extends Thread {
         try {
         	boolean running = true;
     	
-        	while (running) {
-                DataOutputStream toClientStream = new DataOutputStream(socket.getOutputStream());
-                BufferedReader fromClientStream  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            DataOutputStream toClientStream = new DataOutputStream(socket.getOutputStream());
+            BufferedReader fromClientStream  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                HttpRequestManager requestManager = new HttpRequestManager();
-    			requestManager.handleRequest(fromClientStream);
+            HttpRequestManager requestManager = new HttpRequestManager();
+            requestManager.handleRequest(fromClientStream);
 
-    			HttpResponseManager responseManager = new HttpResponseManager(requestManager);
-            	responseManager.buildResponse(toClientStream);
+            HttpResponseManager responseManager = new HttpResponseManager(requestManager);
+            responseManager.buildResponse(toClientStream);
 
-        		socket.close();
-        	}
+            socket.close();
         } catch (IOException e) { 
             e.printStackTrace();
     		System.exit(-1);

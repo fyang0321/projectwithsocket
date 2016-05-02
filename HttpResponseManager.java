@@ -16,13 +16,13 @@ public class HttpResponseManager {
 		requestedFilePath = "www" + requestManager.getFilePath();
 	}	
 
-	private void buildHeader(StringBuffer sb) {
+	private void buildHeader(StringBuffer sb, int contentLen) {
 		header.put("Connection", "Closed");
 		header.put("Date", new Date().toString());
-		header.put("Content-Length", "0"); //TODO: how to calculate length
+		header.put("Content-Length", Integer.toString(contentLen)); 
 		header.put("Server", "Hello I am server!");
 
-		header.put("Content-Type", "application/unknown");
+		header.put("Content-Type", "application/unknown"); //TODO: content type
 
 		for (String name : this.header.keySet()) {
 			sb.append(String.format("%s: %s\r\n", name, this.header.get(name)));
@@ -30,13 +30,16 @@ public class HttpResponseManager {
 		sb.append("\r\n");
 	}
 
-	private void buildReternData(ByteArrayOutputStream output, File f) {
+	private int buildReternData(ByteArrayOutputStream output, File f) {
+		int totalBytesRead = 0;
+
 		try {
 			BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(f));
 			byte[] byteArray = new byte[2000];
 			int bytesRead = 0;
 			while ((bytesRead = inputStream.read(byteArray)) != -1) {
 				output.write(byteArray, 0, bytesRead);
+				totalBytesRead += bytesRead;
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -45,6 +48,8 @@ public class HttpResponseManager {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+
+		return totalBytesRead;
 	}
 
 	public void buildResponse(DataOutputStream toClientStream) {
@@ -57,8 +62,9 @@ public class HttpResponseManager {
 		}
 
 		sb.append(String.format("HTTP/1.1 200 OK \r\n"));
-		buildHeader(sb);
-		buildReternData(outputStream, requestedFile);
+		int contentLength = buildReternData(outputStream, requestedFile);
+		buildHeader(sb, contentLength);
+
 		try {
 			toClientStream.writeBytes("\r");
 			toClientStream.writeBytes(sb.toString());
