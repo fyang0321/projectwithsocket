@@ -94,7 +94,15 @@ public class HttpResponseManager {
 		File requestedFile = new File(this.requestedFilePath);
 				//TODO: handle redirect
 				System.out.println("requestedFilePath: " + requestedFilePath);
-		if(redirectURL.containsKey(this.requestedFilePath)){
+
+		//invalid request
+		if(!this.requestManager.getRequestType().equals(HttpRequestType.GET) &&
+			 !this.requestManager.getRequestType().equals(HttpRequestType.HEAD)){
+			sb.append(String.format("HTTP/1.1 403 Invalid Request \r\n"));
+			buildHeader(sb, 0);
+		}
+		//redirection
+		else if(redirectURL.containsKey(this.requestedFilePath)){
 			sb.append(String.format("HTTP/1.1 301 Redirection \r\n"));
 			String newURL = redirectURL.get(this.requestedFilePath) + "\r\n";
 			int contentLength = newURL.length();
@@ -102,21 +110,30 @@ public class HttpResponseManager {
 			outputStream.write(byteArray, 0, byteArray.length);
 			buildHeader(sb, contentLength);
 		}
-		else if (!requestedFile.exists()) {
+		//not found
+		else if (!requestedFile.exists() || this.requestedFilePath.equals("www/redirect.defs")) {
 			//TODO: throw exception
+			//not found -- or require redirect.defs
 			sb.append(String.format("HTTP/1.1 404 Not Found \r\n"));
 			buildHeader(sb, 0);
 		}
+		//200 ok
 		else{
 			this.getMimeType();
 			sb.append(String.format("HTTP/1.1 200 OK \r\n"));
 			int contentLength = buildReternData(outputStream, requestedFile);
 			buildHeader(sb, contentLength);
 		}
+		//send reply
 		try {
 			toClientStream.writeBytes("\r");
 			toClientStream.writeBytes(sb.toString());
-			outputStream.writeTo(toClientStream);
+			if(this.requestManager.getRequestType().equals(HttpRequestType.GET) ||
+					redirectURL.containsKey(this.requestedFilePath)){
+				//return data when : Request = GET
+				//									 Redirection
+				outputStream.writeTo(toClientStream);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
