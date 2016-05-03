@@ -18,7 +18,8 @@ public class HttpResponseManager {
 
 		requestedFilePath = "www" + requestManager.getFilePath();
 		getRedirectURL();
-		getMimeType();
+		//getMimeType();
+		this.datatype = MimeType.TXT;
 	}
 
 	private void getRedirectURL(){
@@ -26,13 +27,13 @@ public class HttpResponseManager {
 		redirectURL = new HashMap<String, String>();
 
 		try{
-			FileReader redirectDef = new FileReader("wwww/redirect.defs");
+			FileReader redirectDef = new FileReader("www/redirect.defs");
 			BufferedReader redIn = new BufferedReader(redirectDef);
 
 			while((oneLine = redIn.readLine()) != null){
-				String parts[] = oneLine.split(" ");
-				redirectURL.put(parts[0], parts[1]);
-				//System.out.println(parts[0] + " " + parts[1]);
+				String[] parts = oneLine.split(" ");
+				redirectURL.put("www" + parts[0], parts[1]);
+				System.out.println("www" + parts[0] + " : " + parts[1]);
 			}
 
 		} catch (FileNotFoundException e) {
@@ -45,9 +46,11 @@ public class HttpResponseManager {
 	}
 
 	private void getMimeType(){
-		String parts[] = this.requestedFilePath.split(".");
+		String[] parts = this.requestedFilePath.split("\\.");
 		String type_string = parts[parts.length - 1];
-		this.datatype = MimeType.valueOf(type_string);
+		//System.out.println(type_string);
+		this.datatype = MimeType.valueOf(type_string.toUpperCase());
+		//System.out.println(this.datatype.toString());
 	}
 
 	private void buildHeader(StringBuffer sb, int contentLen) {
@@ -90,12 +93,13 @@ public class HttpResponseManager {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		File requestedFile = new File(this.requestedFilePath);
 				//TODO: handle redirect
+				System.out.println("requestedFilePath: " + requestedFilePath);
 		if(redirectURL.containsKey(this.requestedFilePath)){
 			sb.append(String.format("HTTP/1.1 301 Redirection \r\n"));
-			String newURL = redirectURL.get(this.requestedFilePath);
+			String newURL = redirectURL.get(this.requestedFilePath) + "\r\n";
 			int contentLength = newURL.length();
 			byte[] byteArray = newURL.getBytes();
-			outputStream.write(byteArray, 0, 0);
+			outputStream.write(byteArray, 0, byteArray.length);
 			buildHeader(sb, contentLength);
 		}
 		else if (!requestedFile.exists()) {
@@ -104,6 +108,7 @@ public class HttpResponseManager {
 			buildHeader(sb, 0);
 		}
 		else{
+			this.getMimeType();
 			sb.append(String.format("HTTP/1.1 200 OK \r\n"));
 			int contentLength = buildReternData(outputStream, requestedFile);
 			buildHeader(sb, contentLength);
