@@ -7,7 +7,8 @@ public enum MimeType {
 	TXT("txt"),
 	PDF("pdf"),
 	PNG("png"),
-	JPG("jpg");
+	JPG("jpg"),
+	UNKNOWN("unknown");
 
 	private String type;
 	private MimeType(String type){
@@ -36,6 +37,10 @@ class MimeTypeMapper {
 		types.put("pdf", "application/pdf");
 		types.put("png", "image/png");
 		types.put("jpg", "image/jpeg");
+	}
+
+	public boolean containsType(String type) {
+		return types.containsKey(type);
 	}
 
 	public String getMappingType(String type) {

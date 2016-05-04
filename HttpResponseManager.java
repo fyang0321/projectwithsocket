@@ -19,7 +19,7 @@ public class HttpResponseManager {
 		requestedFilePath = "www" + requestManager.getFilePath();
 		getRedirectURL();
 
-		this.datatype = getMimeType();//MimeType.TXT;
+		this.datatype = getMimeType();
 	}
 
 	private void getRedirectURL(){
@@ -46,9 +46,11 @@ public class HttpResponseManager {
 	}
 
 	private MimeType getMimeType(){
-		String[] parts = this.requestedFilePath.split("\\.");
-		//String type_string = parts[parts.length - 1];
-		return MimeType.valueOf(parts[parts.length - 1].toUpperCase());
+		String[] parts = requestedFilePath.split("\\.");
+		String type = parts[parts.length - 1];
+
+		return MimeTypeMapper.getInstance().containsType(type) ? MimeType.valueOf(type.toUpperCase()) :
+												MimeType.valueOf("UNKNOWN");
 	}
 
 	private void buildHeader(StringBuffer sb, int contentLen) {
