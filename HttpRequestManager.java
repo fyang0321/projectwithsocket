@@ -23,7 +23,8 @@ public class HttpRequestManager {
 			while ( (line = clientRequest.readLine()) != null && !line.equals("")) {
 				if (isFirstLine) { //handle the first Request line
 					String[] parts = line.split(" ");
-					this.type = HttpRequestType.valueOf(parts[0]);
+					this.type = parts[0].equals("GET") || parts[0].equals("HEAD") ? 
+									HttpRequestType.valueOf(parts[0]) : HttpRequestType.valueOf("INVALID");
 					this.filePath = parts[1];
 					this.httpVersion = Float.parseFloat(parts[2].replaceAll("HTTP/", ""));
 					isFirstLine = false;

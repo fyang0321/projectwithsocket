@@ -18,8 +18,8 @@ public class HttpResponseManager {
 
 		requestedFilePath = "www" + requestManager.getFilePath();
 		getRedirectURL();
-		//getMimeType();
-		this.datatype = MimeType.TXT;
+
+		this.datatype = getMimeType();//MimeType.TXT;
 	}
 
 	private void getRedirectURL(){
@@ -45,12 +45,10 @@ public class HttpResponseManager {
 		}
 	}
 
-	private void getMimeType(){
+	private MimeType getMimeType(){
 		String[] parts = this.requestedFilePath.split("\\.");
-		String type_string = parts[parts.length - 1];
-		//System.out.println(type_string);
-		this.datatype = MimeType.valueOf(type_string.toUpperCase());
-		//System.out.println(this.datatype.toString());
+		//String type_string = parts[parts.length - 1];
+		return MimeType.valueOf(parts[parts.length - 1].toUpperCase());
 	}
 
 	private void buildHeader(StringBuffer sb, int contentLen) {
@@ -58,10 +56,10 @@ public class HttpResponseManager {
 		header.put("Date", new Date().toString());
 		header.put("Content-Length", Integer.toString(contentLen));
 		header.put("Server", "Hello I am server!");
-		header.put("Content-Type", this.datatype.toString()); //TODO: content type
+		header.put("Content-Type", this.datatype.toString()); 
 
-		for (String name : this.header.keySet()) {
-			sb.append(String.format("%s: %s\r\n", name, this.header.get(name)));
+		for (String name : header.keySet()) {
+			sb.append(String.format("%s: %s\r\n", name, header.get(name)));
 		}
 		sb.append("\r\n");
 	}
@@ -119,7 +117,7 @@ public class HttpResponseManager {
 		}
 		//200 ok
 		else{
-			this.getMimeType();
+			//this.getMimeType();
 			sb.append(String.format("HTTP/1.1 200 OK \r\n"));
 			int contentLength = buildReternData(outputStream, requestedFile);
 			buildHeader(sb, contentLength);

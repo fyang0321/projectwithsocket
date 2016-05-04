@@ -1,5 +1,5 @@
 package networks;
 
-public enum Redirect {
+public class Redirect {
 	
 }
