@@ -33,7 +33,7 @@ public class HttpResponseManager {
 			while((oneLine = redIn.readLine()) != null){
 				String[] parts = oneLine.split(" ");
 				redirectURL.put("www" + parts[0], parts[1]);
-				System.out.println("www" + parts[0] + " : " + parts[1]);
+				//System.out.println("www" + parts[0] + " : " + parts[1]);
 			}
 
 		} catch (FileNotFoundException e) {
@@ -58,7 +58,7 @@ public class HttpResponseManager {
 		header.put("Date", new Date().toString());
 		header.put("Content-Length", Integer.toString(contentLen));
 		header.put("Server", "Hello I am server!");
-		header.put("Content-Type", this.datatype.toString()); 
+		header.put("Content-Type", this.datatype.toString());
 
 		for (String name : header.keySet()) {
 			sb.append(String.format("%s: %s\r\n", name, header.get(name)));
@@ -104,11 +104,13 @@ public class HttpResponseManager {
 		//redirection
 		else if(redirectURL.containsKey(this.requestedFilePath)){
 			sb.append(String.format("HTTP/1.1 301 Redirection \r\n"));
-			String newURL = redirectURL.get(this.requestedFilePath) + "\r\n";
-			int contentLength = newURL.length();
-			byte[] byteArray = newURL.getBytes();
-			outputStream.write(byteArray, 0, byteArray.length);
-			buildHeader(sb, contentLength);
+			String newURL = "Location: " + redirectURL.get(this.requestedFilePath) + "\r\n";
+			// System.out.println("301: " + newURL);
+			// int contentLength = newURL.length();
+			// byte[] byteArray = newURL.getBytes();
+			// outputStream.write(byteArray, 0, byteArray.length);
+			// buildHeader(sb, contentLength);
+			sb.append(String.format(newURL));
 		}
 		//not found
 		else if (!requestedFile.exists() || this.requestedFilePath.equals("www/redirect.defs")) {
