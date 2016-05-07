@@ -1,4 +1,4 @@
-package networks;
+//package networks;
 
 import java.io.*;
 import java.util.*;
@@ -33,7 +33,6 @@ public class HttpResponseManager {
 			while((oneLine = redIn.readLine()) != null){
 				String[] parts = oneLine.split(" ");
 				redirectURL.put("www" + parts[0], parts[1]);
-				//System.out.println("www" + parts[0] + " : " + parts[1]);
 			}
 
 		} catch (FileNotFoundException e) {
@@ -92,8 +91,6 @@ public class HttpResponseManager {
 		StringBuffer sb = new StringBuffer();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		File requestedFile = new File(this.requestedFilePath);
-				//TODO: handle redirect
-				System.out.println("requestedFilePath: " + requestedFilePath);
 
 		//invalid request
 		if(!this.requestManager.getRequestType().equals(HttpRequestType.GET) &&
@@ -105,35 +102,26 @@ public class HttpResponseManager {
 		else if(redirectURL.containsKey(this.requestedFilePath)){
 			sb.append(String.format("HTTP/1.1 301 Redirection \r\n"));
 			String newURL = "Location: " + redirectURL.get(this.requestedFilePath) + "\r\n";
-			// System.out.println("301: " + newURL);
-			// int contentLength = newURL.length();
-			// byte[] byteArray = newURL.getBytes();
-			// outputStream.write(byteArray, 0, byteArray.length);
-			// buildHeader(sb, contentLength);
 			sb.append(String.format(newURL));
 		}
 		//not found
 		else if (!requestedFile.exists() || this.requestedFilePath.equals("www/redirect.defs")) {
-			//TODO: throw exception
-			//not found -- or require redirect.defs
 			sb.append(String.format("HTTP/1.1 404 Not Found \r\n"));
 			buildHeader(sb, 0);
 		}
 		//200 ok
 		else{
-			//this.getMimeType();
 			sb.append(String.format("HTTP/1.1 200 OK \r\n"));
 			int contentLength = buildReternData(outputStream, requestedFile);
 			buildHeader(sb, contentLength);
 		}
+
 		//send reply
 		try {
 			toClientStream.writeBytes("\r");
 			toClientStream.writeBytes(sb.toString());
 			if(this.requestManager.getRequestType().equals(HttpRequestType.GET) ||
 					redirectURL.containsKey(this.requestedFilePath)){
-				//return data when : Request = GET
-				//									 Redirection
 				outputStream.writeTo(toClientStream);
 			}
 		} catch (IOException e) {

@@ -1,4 +1,4 @@
-package networks;
+//package networks;
 
 public enum HttpRequestType {
 	HEAD("HEAD"),
