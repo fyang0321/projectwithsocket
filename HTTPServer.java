@@ -36,7 +36,7 @@ public class HTTPServer {
 			new HTTPServerThread(isSSL, sslServerPort).start();
 			new HTTPServerThread(!isSSL, serverPort).start();
    	    } catch (Exception e) {
-            System.err.println("Could not listen on port " + serverPort);
+            System.err.println("Could not listen on port");
             System.exit(-1);
         }
 	}

@@ -52,26 +52,11 @@ public class HTTPServerThread extends Thread {
                 context.init(factory.getKeyManagers(), null, null);
                 SSLServerSocketFactory sslFactory = context.getServerSocketFactory();
                 sslServerSocket = (SSLServerSocket)sslFactory.createServerSocket(portNumber);
-            } catch (KeyStoreException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(-1);
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            } catch (CertificateException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            } catch (UnrecoverableKeyException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            } 
-            
+            }
+                        
             return sslServerSocket;
         } else {
             ServerSocket serverSocket = null;

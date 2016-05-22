@@ -6,7 +6,7 @@ JC = javac
 
 CLASSES = \
         HttpRequestType.java \
-	MimeType.java \
+		MimeType.java \
         HttpRequestManager.java \
         HttpResponseManager.java \
         Utils.java \
