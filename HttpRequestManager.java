@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class HttpRequestManager {
-	private HttpRequestType type;
+	private HttpRequestType type = HttpRequestType.valueOf("INVALID");
 	private String filePath = null;
 	private float httpVersion;
 
