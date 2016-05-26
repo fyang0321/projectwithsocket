@@ -8,6 +8,7 @@ public class HttpResponseManager {
 	private Map<String, String> header = null;
 	private HttpRequestManager requestManager = null;
 	private String requestedFilePath = null;
+	private String cntType = null;
 
 	private Map<String, String> redirectURL = null;
 	private MimeType datatype = null;
@@ -17,6 +18,7 @@ public class HttpResponseManager {
 		requestManager = request;
 
 		requestedFilePath = "www" + requestManager.getFilePath();
+		cntType = requestManager.getCntType();
 		getRedirectURL();
 
 		this.datatype = getMimeType();
@@ -53,7 +55,7 @@ public class HttpResponseManager {
 	}
 
 	private void buildHeader(StringBuffer sb, int contentLen) {
-		header.put("Connection", "Closed");
+		header.put("Connection", cntType);
 		header.put("Date", new Date().toString());
 		header.put("Content-Length", Integer.toString(contentLen));
 		header.put("Server", "Hello I am server!");

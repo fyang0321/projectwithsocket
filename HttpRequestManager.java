@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 public class HttpRequestManager {
 	private HttpRequestType type = HttpRequestType.valueOf("INVALID");
 	private String filePath = null;
+	private String connectionType = "keep-alive";
 	private float httpVersion;
 
 	private Map<String, String> metaData;
@@ -21,9 +22,10 @@ public class HttpRequestManager {
 		String line = null;
 		try {
 			while ( (line = clientRequest.readLine()) != null && !line.equals("")) {
+				System.out.println(line);
 				if (isFirstLine) { //handle the first Request line
 					String[] parts = line.split(" ");
-					this.type = parts[0].equals("GET") || parts[0].equals("HEAD") ? 
+					this.type = parts[0].equals("GET") || parts[0].equals("HEAD") ?
 									HttpRequestType.valueOf(parts[0]) : HttpRequestType.valueOf("INVALID");
 					this.filePath = parts[1];
 					this.httpVersion = Float.parseFloat(parts[2].replaceAll("HTTP/", ""));
@@ -37,7 +39,7 @@ public class HttpRequestManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
-		} 
+		}
 	}
 
 	public HttpRequestType getRequestType() {
@@ -46,6 +48,15 @@ public class HttpRequestManager {
 
 	public String getFilePath() {
 		return filePath;
+	}
+
+	public String getCntType() {
+		if(metaData.containsKey("Connection")){
+			return metaData.get("Connection");
+		}
+		else{
+			return connectionType;
+		}
 	}
 
 	public float getHttpVersion() {
@@ -65,7 +76,7 @@ public class HttpRequestManager {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader("test"));
 			manager = new HttpRequestManager();
-		
+
 				manager.handleRequest(br);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -73,8 +84,7 @@ public class HttpRequestManager {
 		}
 		System.out.println(manager.getRequestType().toString());
 		System.out.println("File path is " + manager.getFilePath());
-		System.out.println(manager.getHttpVersion());	
+		System.out.println(manager.getHttpVersion());
 		System.out.println(manager.getLength());
 	}
 }
-
