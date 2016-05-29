@@ -9,32 +9,39 @@ import java.security.cert.CertificateException;
 
 public class HTTPServerThread extends Thread {
     private ServerSocket serverSocket = null;
- 
+
     public HTTPServerThread(boolean isSSL, int portNumber) {
-        super("HTTPServerThread"); 
+        super("HTTPServerThread");
         serverSocket = initializeSocket(isSSL, portNumber);
     }
-     
+
     public void run() {
         boolean listening = true;
         while (listening) {
-            try {    	
+            try {
                 Socket socket = serverSocket.accept();
 
                 DataOutputStream toClientStream = new DataOutputStream(socket.getOutputStream());
                 BufferedReader fromClientStream  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 HttpRequestManager requestManager = new HttpRequestManager();
-                requestManager.handleRequest(fromClientStream);
-
-                HttpResponseManager responseManager = new HttpResponseManager(requestManager);
-                responseManager.buildResponse(toClientStream);
+                while(true)
+                {
+                  requestManager.handleRequest(fromClientStream);
+                  String cntType = requestManager.getCntType();
+                  HttpResponseManager responseManager = new HttpResponseManager(requestManager);
+                  responseManager.buildResponse(toClientStream);
+                  if(cntType.equals(" close")){
+                    break;
+                  }
+                }
 
                 socket.close();
-            } catch (IOException e) { 
-                e.printStackTrace();
-        		System.exit(-1);
-        	}
+                // System.out.println("Close Connection");
+            } catch (IOException e) {
+              // System.out.println("Timed out, close this socket.");
+              System.out.println("Remote socket may be closed");
+        	  }
         }
     }
 
@@ -56,13 +63,13 @@ public class HTTPServerThread extends Thread {
                 e.printStackTrace();
                 System.exit(-1);
             }
-                        
+
             return sslServerSocket;
         } else {
             ServerSocket serverSocket = null;
 
             try {
-                serverSocket = new ServerSocket(portNumber); 
+                serverSocket = new ServerSocket(portNumber);
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(-1);
@@ -73,4 +80,3 @@ public class HTTPServerThread extends Thread {
     }
 
 }
-

@@ -89,7 +89,7 @@ public class HttpResponseManager {
 		return totalBytesRead;
 	}
 
-	public void buildResponse(DataOutputStream toClientStream) {
+	public void buildResponse(DataOutputStream toClientStream) throws IOException {
 		StringBuffer sb = new StringBuffer();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		File requestedFile = new File(this.requestedFilePath);
@@ -122,13 +122,15 @@ public class HttpResponseManager {
 		try {
 			toClientStream.writeBytes("\r");
 			toClientStream.writeBytes(sb.toString());
+			System.out.println("Response:\n" + sb + "\n");
 			if(this.requestManager.getRequestType().equals(HttpRequestType.GET) ||
 					redirectURL.containsKey(this.requestedFilePath)){
 				outputStream.writeTo(toClientStream);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
+			// e.printStackTrace();
+			// System.exit(-1);
+			throw e;
 		}
 	}
 }
