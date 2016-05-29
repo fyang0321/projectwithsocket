@@ -6,7 +6,6 @@ import string
 import sys
 import time
 import urllib2
-from __future__ import print_function
 from urllib2 import urlopen,HTTPError
 
 TIMEOUT = 5  # seconds
@@ -20,7 +19,7 @@ NOTFOUNDS = ['/redirect.defs', '/not/a/real/url.html']
 class DontFollowHttpRedirectHandler(urllib2.HTTPRedirectHandler):
 	def http_error_307(self, req, fp, code, msg, headers):
 		raise urllib2.HTTPError(req.get_full_url(), code, msg, headers, fp)
-	http_error_302 = http_error_303 = http_error_307
+	http_error_302 = http_error_303 = http_error_307 
 
 # reads file contents from disk, so we can compare with what the server returned.
 def read_file(url):
@@ -33,7 +32,7 @@ class NonPersistentTestRunner:
 		self._host = host
 		self._port = port
 		self._scheme = scheme
-
+  
 	def _build_url(self, filename):
 		return '%s://%s:%s%s' % (self._scheme, self._host, self._port, filename)
 
@@ -112,7 +111,7 @@ class NonPersistentTestRunner:
 			'POST' : (self.test_POST, None),
 			'INVALID' : (self.test_INVALID, None),
 		}
-
+	
 		for test_case in test_list:
 			func, op = test_list[test_case]
 			try:
@@ -159,7 +158,7 @@ class SimultaneousTestRunner:
 		except socket.error, msg:
 			print 'error creating HTTP socket, FAIL', msg[1]
 			return False
-
+		
 		try:
 			sock.connect((self._host, int(self._port)))
 		except socket.error, msg:
@@ -170,8 +169,8 @@ class SimultaneousTestRunner:
 		# and try the HTTPS connection
 		response = urllib2.urlopen('https://%s:%s/index.html' % (self._host, int(self._sslPort)))
 		return response.getcode() == 200
-
-
+ 
+	
 def parse_flags(argv):
 	arg_map = {}
 	if len(argv) <= 1: return {}
@@ -191,8 +190,8 @@ def dump_results(result_map):
 	for label in result_map:
 		if not result_map[label]:
 			print '\t\t' + label
-
-
+	
+		
 if __name__  == '__main__':
 	arg_map = parse_flags(sys.argv)
 	if ('--host' not in arg_map) or ('--port' not in arg_map) or ('--sslport' not in arg_map):
@@ -204,7 +203,7 @@ if __name__  == '__main__':
 
 	print '\n\nHTTP tests!'
 	dump_results(NonPersistentTestRunner(host, port, 'http').run_all_tests())
-
+	
 	print '\n\nHTTPS tests!'
 	dump_results(NonPersistentTestRunner(host, sslport, 'https').run_all_tests())
 
@@ -215,11 +214,11 @@ if __name__  == '__main__':
 		print 'FAILED'
 
 	print '\n\nSimultaneous tests!'
-	try:
+	try:	
 		simultaneous = SimultaneousTestRunner(host, port, sslport).testSimultaneousConnections()
 	except Exception as e:
 		print e
-		simultaneous = False
+		simultaneous = False		
 	if simultaneous:
 		print 'PASSED'
 	else:
